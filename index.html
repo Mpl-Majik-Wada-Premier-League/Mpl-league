@@ -5,59 +5,52 @@
 <title>MPL League</title>
 <style>
 body{font-family:Poppins;background:#f4f6f8;padding:20px}
-.card{background:#fff;padding:15px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.2);margin:10px 0}
+.card{background:#fff;padding:15px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2);margin:12px 0}
 .live{border-left:6px solid red}
+nav button{padding:10px 15px;margin:5px;border:none;background:#1a73e8;color:#fff;border-radius:6px}
+section{display:none}
+section.active{display:block}
 </style>
 </head>
+
 <body>
 
-<h1>MPL League</h1>
-<select id="yearSel" onchange="render()"></select>
+<h1>🏏 MPL League</h1>
 
-<h2>Live Matches</h2>
-<div id="live"></div>
+<nav>
+<button onclick="show('live')">Live</button>
+<button onclick="show('upcoming')">Upcoming</button>
+<button onclick="show('completed')">Completed</button>
+</nav>
 
-<h2>Upcoming Matches</h2>
-<div id="upcoming"></div>
-
-<h2>Completed Matches</h2>
-<div id="completed"></div>
-
-<h2>Players</h2>
-<div id="players"></div>
+<section id="live" class="active"><h2>Live Matches</h2></section>
+<section id="upcoming"><h2>Upcoming Matches</h2></section>
+<section id="completed"><h2>Completed Matches</h2></section>
 
 <script>
 const data=JSON.parse(localStorage.getItem("mplData")||"{}");
 
-function renderYears(){
- yearSel.innerHTML="";
- Object.keys(data).forEach(y=>{
-  let o=document.createElement("option");
-  o.value=y;o.textContent=y;
-  yearSel.appendChild(o);
- });
+function show(id){
+ document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
 }
 
-function render(){
- let y=yearSel.value;
- live.innerHTML=upcoming.innerHTML=completed.innerHTML=players.innerHTML="";
- ["live","upcoming","completed"].forEach(t=>{
-  data[y][t].forEach(m=>{
+Object.values(data).forEach(year=>{
+ ["live","upcoming","completed"].forEach(type=>{
+  year[type]?.forEach(m=>{
    let c=document.createElement("div");
-   c.className="card "+(t==="live"?"live":"");
-   c.innerHTML=`<b>${m.teamA} vs ${m.teamB}</b><br>
-   Score: ${m.scoreA}/${m.wicketA} - ${m.scoreB}/${m.wicketB}<br>
-   Overs: ${m.oversA} | ${m.oversB}`;
-   document.getElementById(t).appendChild(c);
+   c.className="card"+(type==="live"?" live":"");
+   c.innerHTML=`
+    <b>${m.teamA} vs ${m.teamB}</b><br>
+    Score: ${m.scoreA}/${m.wicketA} - ${m.scoreB}/${m.wicketB}<br>
+    Overs: ${m.oversA} | ${m.oversB}<br>
+    Date: ${m.date} ${m.time}
+   `;
+   document.getElementById(type).appendChild(c);
   });
  });
- data[y].players.forEach(p=>{
-  players.innerHTML+=`<div class="card">${p.name} (${p.team})</div>`;
- });
-}
-
-renderYears();
-render();
+});
 </script>
+
 </body>
 </html>
