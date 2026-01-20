@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MPL Admin</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<header>
+  <h1>MPL Admin Panel</h1>
+</header>
+
+<div class="card" id="loginBox">
+  <input type="password" id="adminPass" placeholder="Admin Password">
+  <button onclick="login()">Login</button>
+  <p id="msg"></p>
+</div>
+
+<div id="adminPanel" style="display:none">
+
+  <div class="card">
+    <h3>Select Year</h3>
+    <input id="yearInput" placeholder="2026">
+    <button onclick="setYear()">Confirm</button>
+  </div>
+
+  <div class="card">
+    <h3>Create Match</h3>
+    <select id="status">
+      <option value="live">Live</option>
+      <option value="upcoming">Upcoming</option>
+      <option value="completed">Completed</option>
+    </select>
+    <input id="teamA" placeholder="Team A">
+    <input id="teamB" placeholder="Team B">
+    <input type="date" id="date">
+    <input type="time" id="time">
+    <button onclick="addMatch()">Add Match</button>
+  </div>
+
+  <div class="card">
+    <h3>Ball by Ball</h3>
+    <input id="matchId" placeholder="Match ID">
+    <input id="bowler" placeholder="Bowler">
+    <input id="runs" placeholder="Runs">
+    <select id="wicket">
+      <option value="false">No Wicket</option>
+      <option value="true">Wicket</option>
+    </select>
+    <button onclick="addBall()">Add Ball</button>
+  </div>
+
+  <div class="card">
+    <h3>Add Player</h3>
+    <input id="pName" placeholder="Player Name">
+    <input id="pTeam" placeholder="Team">
+    <input id="pRole" placeholder="Role">
+    <button onclick="addPlayer()">Add Player</button>
+  </div>
+
+</div>
+
+<script src="../js/data.js"></script>
+<script src="admin.js"></script>
+</body>
+  </html>
