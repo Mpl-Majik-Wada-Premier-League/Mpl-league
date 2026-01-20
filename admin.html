@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MPL Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  font-family:'Segoe UI',sans-serif;
+  background:radial-gradient(circle at top,#0e1a3a,#050814);
+  color:#fff;
+  padding:20px;
+}
+h2{text-align:center;color:#00ffcc}
+.card{
+  max-width:420px;
+  margin:20px auto;
+  background:linear-gradient(160deg,#111a3a,#0b1020);
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 0 25px rgba(0,255,200,.25);
+}
+input,button{
+  width:100%;
+  padding:12px;
+  margin:7px 0;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+}
+input{background:#050814;color:#fff}
+button{
+  background:linear-gradient(135deg,#00ffcc,#0055ff);
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
+}
+button:hover{opacity:.85}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<h2>🏏 MPL ADMIN PANEL</h2>
+
+<div id="loginBox" class="card">
+  <input type="password" id="password" placeholder="Admin Password">
+  <button onclick="login()">LOGIN</button>
+</div>
+
+<div id="adminBox" class="card hidden">
+  <input id="teamA" placeholder="Team A">
+  <input id="teamB" placeholder="Team B">
+  <input id="scoreA" placeholder="Team A Score">
+  <input id="scoreB" placeholder="Team B Score">
+  <input id="date" placeholder="Date & Time">
+  <button onclick="saveMatch()">SAVE MATCH</button>
+  <button onclick="clearData()">CLEAR ALL DATA</button>
+</div>
+
+<script>
+const ADMIN_PASSWORD="@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+
+function login(){
+  if(password.value===ADMIN_PASSWORD){
+    loginBox.classList.add("hidden");
+    adminBox.classList.remove("hidden");
+  }else{
+    alert("Wrong Password");
+  }
+}
+
+function saveMatch(){
+  const data=JSON.parse(localStorage.getItem("mplData"))||[];
+  data.push({
+    teamA:teamA.value,
+    teamB:teamB.value,
+    scoreA:scoreA.value,
+    scoreB:scoreB.value,
+    date:date.value
+  });
+  localStorage.setItem("mplData",JSON.stringify(data));
+  alert("Match Saved");
+}
+
+function clearData(){
+  if(confirm("Delete all matches?")){
+    localStorage.removeItem("mplData");
+    alert("All data cleared");
+  }
+}
+</script>
+
+</body>
+</html>
+
