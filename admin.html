@@ -2,91 +2,137 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MPL Admin Panel</title>
+<title>MPL Admin Pro</title>
 <style>
 body{font-family:Poppins;background:#f4f6f8;padding:20px}
-.box{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2);margin-bottom:20px}
-input,select,button{width:100%;padding:8px;margin:6px 0}
-button{background:#1a73e8;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.hidden{display:none}
+.box{background:#fff;padding:20px;border-radius:14px;box-shadow:0 4px 15px rgba(0,0,0,.2);margin-bottom:20px}
+button{padding:10px 16px;margin:5px;border:none;border-radius:6px;background:#1a73e8;color:#fff;cursor:pointer}
+input,select{width:100%;padding:8px;margin:5px 0}
+.nav button{background:#0d47a1}
 </style>
 </head>
-
 <body>
 
-<div id="loginBox" class="box">
+<div id="login" class="box">
 <h2>Admin Login</h2>
-<input type="password" id="password" placeholder="Enter password">
+<input id="pass" type="password" placeholder="Password">
 <button onclick="login()">Login</button>
 <p id="msg"></p>
 </div>
 
-<div id="adminBox" style="display:none">
+<div id="panel" class="hidden">
 
-<div class="box">
-<h3>Add Match</h3>
-<input id="year" placeholder="Year (2026)">
-<select id="status">
-<option value="live">Live</option>
-<option value="upcoming">Upcoming</option>
-<option value="completed">Completed</option>
-</select>
+<div class="nav">
+<button onclick="show('teams')">Teams</button>
+<button onclick="show('matches')">Matches</button>
+<button onclick="show('live')">Live Scoring</button>
+</div>
+
+<!-- TEAMS -->
+<div id="teams" class="box hidden">
+<h3>Team Management</h3>
+<input id="teamName" placeholder="Team Name">
+<input id="teamLogo" placeholder="Team Logo URL">
+<button onclick="addTeam()">Add Team</button>
+<div id="teamList"></div>
+</div>
+
+<!-- MATCHES -->
+<div id="matches" class="box hidden">
+<h3>Match Management</h3>
+<input id="matchId" placeholder="Match ID">
 <input id="teamA" placeholder="Team A">
 <input id="teamB" placeholder="Team B">
-<input id="scoreA" placeholder="Score A">
-<input id="wicketA" placeholder="Wickets A">
-<input id="oversA" placeholder="Overs A">
-<input id="scoreB" placeholder="Score B">
-<input id="wicketB" placeholder="Wickets B">
-<input id="oversB" placeholder="Overs B">
+<select id="status">
+<option>upcoming</option>
+<option>live</option>
+<option>completed</option>
+</select>
 <input type="date" id="date">
 <input type="time" id="time">
-<button onclick="saveMatch()">Save Match</button>
+<button onclick="saveMatch()">Save / Update</button>
+<div id="matchList"></div>
+</div>
+
+<!-- LIVE SCORING -->
+<div id="live" class="box hidden">
+<h3>Ball by Ball Scoring</h3>
+<input id="liveMatchId" placeholder="Match ID">
+<input id="batsman" placeholder="Batsman">
+<input id="bowler" placeholder="Bowler">
+<select id="ball">
+<option value="0">0</option><option value="1">1</option><option value="2">2</option>
+<option value="3">3</option><option value="4">4</option><option value="6">6</option>
+<option value="W">Wicket</option>
+</select>
+<button onclick="addBall()">Add Ball</button>
 </div>
 
 </div>
 
 <script>
-const ADMIN_PASSWORD="admin123"; // you can change this
+const PASSWORD="@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+let db=JSON.parse(localStorage.getItem("mplPRO")||'{"teams":[],"matches":{}}');
+
+function save(){localStorage.setItem("mplPRO",JSON.stringify(db));}
 
 function login(){
- if(password.value===ADMIN_PASSWORD){
-  loginBox.style.display="none";
-  adminBox.style.display="block";
- }else{
-  msg.innerText="Wrong password";
- }
+ if(pass.value===PASSWORD){
+  login.classList.add("hidden");
+  panel.classList.remove("hidden");
+ } else msg.innerText="Wrong password";
 }
 
-function getData(){
- return JSON.parse(localStorage.getItem("mplData")||"{}");
+function show(id){
+ document.querySelectorAll(".box").forEach(b=>b.classList.add("hidden"));
+ document.getElementById(id).classList.remove("hidden");
 }
 
-function saveData(d){
- localStorage.setItem("mplData",JSON.stringify(d));
+/* TEAMS */
+function addTeam(){
+ db.teams.push({name:teamName.value,logo:teamLogo.value});
+ save(); renderTeams();
+}
+function renderTeams(){
+ teamList.innerHTML="";
+ db.teams.forEach(t=>teamList.innerHTML+=`<p>${t.name}</p>`);
 }
 
+/* MATCHES */
 function saveMatch(){
- let data=getData();
- let y=year.value;
- data[y]??={live:[],upcoming:[],completed:[]};
-
- data[y][status.value].push({
+ db.matches[matchId.value]={
+  id:matchId.value,
   teamA:teamA.value,
   teamB:teamB.value,
-  scoreA:scoreA.value,
-  wicketA:wicketA.value,
-  oversA:oversA.value,
-  scoreB:scoreB.value,
-  wicketB:wicketB.value,
-  oversB:oversB.value,
-  date:date.value,
-  time:time.value
- });
-
- saveData(data);
- alert("Match saved successfully");
+  status:status.value,
+  date:date.value,time:time.value,
+  balls:[],stats:{}
+ };
+ save(); renderMatches();
 }
-</script>
+function renderMatches(){
+ matchList.innerHTML="";
+ Object.values(db.matches).forEach(m=>{
+  matchList.innerHTML+=`
+  <p>${m.id} (${m.status})
+  <button onclick="deleteMatch('${m.id}')">Delete</button></p>`;
+ });
+}
+function deleteMatch(id){
+ delete db.matches[id]; save(); renderMatches();
+}
 
+/* BALL BY BALL */
+function addBall(){
+ let m=db.matches[liveMatchId.value];
+ if(!m) return alert("Match not found");
+ m.balls.push({batsman,bowler,ball:ball.value});
+ save();
+ alert("Ball Added");
+}
+
+renderTeams(); renderMatches();
+</script>
 </body>
 </html>
