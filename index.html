@@ -1,115 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>MPL League</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --bg:#0b1020; --card:#121833; --accent:#00ffd5; --text:#ffffff; --muted:#9aa4ff;
-    }
-    *{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-    body{margin:0;background:var(--bg);color:var(--text)}
-    header{padding:20px;text-align:center;background:linear-gradient(135deg,#1a1f4a,#0b1020)}
-    header h1{margin:0;color:var(--accent);letter-spacing:2px}
-    nav{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
-    nav button{background:var(--card);border:1px solid var(--accent);color:var(--text);padding:8px 14px;border-radius:8px;cursor:pointer}
-    nav button.active{background:var(--accent);color:#000}
-    main{padding:20px;max-width:1200px;margin:auto}
-    .card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
-    .match{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
-    .team{text-align:center}
-    .vs{text-align:center;color:var(--accent);font-weight:bold}
-    .score{font-size:22px;color:var(--accent)}
-    .meta{font-size:13px;color:var(--muted)}
-    table{width:100%;border-collapse:collapse;margin-top:10px}
-    th,td{border-bottom:1px solid #2a3160;padding:6px;text-align:left;font-size:14px}
-    th{color:var(--accent)}
-    footer{text-align:center;padding:20px;color:var(--muted)}
-
-    /* Admin */
-    .admin-only{display:none}
-    .admin input,.admin textarea,.admin select{width:100%;padding:8px;margin:4px 0;border-radius:6px;border:none}
-    .admin button{margin-top:6px}
-  </style>
+<meta charset="UTF-8">
+<title>MPL League</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(20px)}
+  to {opacity:1; transform:translateY(0)}
+}
+body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:radial-gradient(circle at top,#0e1a3a,#050814);
+  color:#fff;
+}
+header{
+  padding:25px;
+  text-align:center;
+  background:linear-gradient(135deg,#00ffcc,#0055ff);
+  color:#000;
+}
+header h1{
+  margin:0;
+  font-size:30px;
+  letter-spacing:2px;
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+.match-card{
+  background:linear-gradient(160deg,#111a3a,#0b1020);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:18px;
+  animation:fadeIn .6s ease;
+  box-shadow:0 0 20px rgba(0,255,200,.2);
+}
+.teams{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:20px;
+  font-weight:700;
+}
+.vs{
+  background:#00ffcc;
+  color:#000;
+  padding:5px 14px;
+  border-radius:20px;
+  font-size:14px;
+}
+.scores{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+  font-size:18px;
+  color:#00ffcc;
+}
+.date{
+  font-size:13px;
+  color:#aaa;
+  margin-top:8px;
+}
+.empty{
+  text-align:center;
+  opacity:.6;
+  margin-top:50px;
+}
+</style>
 </head>
 <body>
+
 <header>
   <h1>MPL LEAGUE</h1>
-  <div class="meta">Official Match & Score Updates</div>
-  <nav id="yearNav"></nav>
+  <p>Majik Wada Premier League</p>
 </header>
 
-<main>
-  <div id="home"></div>
-
-  <!-- Admin Panel -->
-  <div id="adminPanel" class="card admin admin-only">
-    <h2>Admin Panel</h2>
-    <input type="password" id="adminPass" placeholder="Enter Admin Password" />
-    <button onclick="loginAdmin()">Login</button>
-
-    <div id="adminControls" style="display:none">
-      <h3>Add / Update Match</h3>
-      <select id="yearSelect"></select>
-      <input id="matchId" placeholder="Match ID (unique)" />
-      <input id="teamA" placeholder="Team A" />
-      <input id="teamB" placeholder="Team B" />
-      <input id="dateTime" placeholder="Date & Time" />
-      <input id="scoreA" placeholder="Team A Score (eg 145/6)" />
-      <input id="scoreB" placeholder="Team B Score" />
-      <textarea id="playersA" placeholder="Team A Players (comma separated)"></textarea>
-      <textarea id="playersB" placeholder="Team B Players"></textarea>
-      <textarea id="bowling" placeholder="Bowling Data (Player - overs - runs - wickets)"></textarea>
-      <button onclick="saveMatch()">Save Match</button>
-      <p class="meta">⚠ After updating, click Export JSON and commit it to GitHub to keep data permanent.</p>
-      <button onclick="exportJSON()">Export JSON</button>
-    </div>
-  </div>
-</main>
-
-<footer>© MPL League</footer>
+<div class="container" id="matches"></div>
 
 <script>
-/* ================= CONFIG ================= */
-const ADMIN_PASSWORD = "@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+const data = JSON.parse(localStorage.getItem("mplData")) || [];
+const box = document.getElementById("matches");
 
-/* ================= DATA ================= */
-let data = JSON.parse(localStorage.getItem('mplData')) || {
-  2026:{matches:[]}
-};
-
-/* ================= INIT ================= */
-const yearNav = document.getElementById('yearNav');
-const home = document.getElementById('home');
-const yearSelect = document.getElementById('yearSelect');
-
-function init(){
-  renderYears();
-  const firstYear = Object.keys(data)[0];
-  showYear(firstYear);
-  setupAdmin();
+if(data.length===0){
+  box.innerHTML="<p class='empty'>No match data yet</p>";
 }
 
-function renderYears(){
-  yearNav.innerHTML = '';
-  yearSelect.innerHTML = '';
-  Object.keys(data).forEach(y=>{
-    const b = document.createElement('button');
-    b.textContent = y;
-    b.onclick = ()=>showYear(y);
-    yearNav.appendChild(b);
+data.forEach(m=>{
+  const card=document.createElement("div");
+  card.className="match-card";
+  card.innerHTML=`
+    <div class="teams">
+      <span>${m.teamA}</span>
+      <span class="vs">VS</span>
+      <span>${m.teamB}</span>
+    </div>
+    <div class="scores">
+      <span>${m.scoreA}</span>
+      <span>${m.scoreB}</span>
+    </div>
+    <div class="date">${m.date}</div>
+  `;
+  box.appendChild(card);
+});
+</script>
 
-    const o = document.createElement('option');
-    o.value = y; o.textContent = y;
-    yearSelect.appendChild(o);
-  });
-}
-
-function showYear(year){
-  home.innerHTML = '';
-  (data[year]?.matches || []).forEach(m=>{
-    const card = document.createElement('div');
+</body>
+</html>
     card.className='card';
     card.innerHTML = `
       <div class="match">
