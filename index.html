@@ -5,12 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MPL League</title>
 <style>
-body { font-family: Arial, sans-serif; background:#f7f7f7; margin:0; padding:0; }
-header { background:#1a73e8; color:white; padding:20px; text-align:center; }
-nav { padding:15px; text-align:center; }
-.match-card { background:white; margin:15px; padding:15px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.2); transition:0.3s; }
-.match-card:hover { transform:scale(1.03); box-shadow:0 0 15px rgba(0,0,0,0.3); }
-h2 { text-align:center; }
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f7f7f7;}
+header { background:#1a73e8; color:white; padding:15px 20px; display:flex; align-items:center; justify-content:space-between;}
+header h1 { margin:0;}
+nav { background:#0d47a1; }
+nav ul { display:flex; list-style:none; margin:0; padding:0;}
+nav ul li { margin:0; }
+nav ul li a { color:white; display:block; padding:12px 20px; text-decoration:none; transition:0.3s;}
+nav ul li a:hover { background:#1565c0; }
+section { display:none; padding:20px;}
+section.active { display:block; }
+.match-card { background:white; margin:15px 0; padding:15px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.2);}
+.match-card:hover { transform:scale(1.02); transition:0.3s; }
+.player-card { display:inline-block; margin:10px; padding:10px; background:white; border-radius:10px; text-align:center; box-shadow:0 0 5px rgba(0,0,0,0.2);}
+.player-card img { width:60px; height:60px; border-radius:50%; display:block; margin:0 auto 5px;}
 </style>
 </head>
 <body>
@@ -20,72 +28,102 @@ h2 { text-align:center; }
 </header>
 
 <nav>
-  <label for="yearSelect">Select Year:</label>
-  <select id="yearSelect"></select>
+  <ul>
+    <li><a href="#" onclick="showSection('home')">Home</a></li>
+    <li><a href="#" onclick="showSection('live')">Live Score</a></li>
+    <li><a href="#" onclick="showSection('upcoming')">Upcoming Matches</a></li>
+    <li><a href="#" onclick="showSection('completed')">Completed Matches</a></li>
+    <li><a href="#" onclick="showSection('players')">Players</a></li>
+  </ul>
 </nav>
 
-<main>
-  <section id="liveSection">
-    <h2>Live Matches</h2>
-    <div id="liveMatches">No live matches yet.</div>
-  </section>
+<section id="home" class="active">
+  <h2>Welcome to MPL League</h2>
+  <p>Check out live scores, upcoming matches, completed matches, and team player lists.</p>
+</section>
 
-  <section id="upcomingSection">
-    <h2>Upcoming Matches</h2>
-    <div id="upcomingMatches">No upcoming matches yet.</div>
-  </section>
-</main>
+<section id="live">
+  <h2>Live Matches</h2>
+  <div id="liveMatches"><p>No live matches yet. Admin will update live scores.</p></div>
+</section>
+
+<section id="upcoming">
+  <h2>Upcoming Matches</h2>
+  <div id="upcomingMatches"><p>No upcoming matches yet. Admin will update schedule.</p></div>
+</section>
+
+<section id="completed">
+  <h2>Completed Matches</h2>
+  <div id="completedMatches"><p>No completed matches yet.</p></div>
+</section>
+
+<section id="players">
+  <h2>Players List</h2>
+  <div id="playersList"><p>Admin will add players per team with logos.</p></div>
+</section>
 
 <script>
-const yearSelect = document.getElementById('yearSelect');
-const liveMatchesDiv = document.getElementById('liveMatches');
-const upcomingMatchesDiv = document.getElementById('upcomingMatches');
-
-fetch('data.json')
-.then(res => res.json())
-.then(data => {
-  Object.keys(data).forEach(year => {
-    const option = document.createElement('option');
-    option.value = year;
-    option.textContent = year;
-    yearSelect.appendChild(option);
-  });
-  showMatches(Object.keys(data)[0], data);
-  yearSelect.addEventListener('change', () => showMatches(yearSelect.value, data));
-});
-
-function showMatches(year, data){
-  const matches = data[year] || [];
-  liveMatchesDiv.innerHTML = '';
-  upcomingMatchesDiv.innerHTML = '';
-
-  if(matches.length === 0){
-    liveMatchesDiv.innerHTML = '<p>No live matches.</p>';
-    upcomingMatchesDiv.innerHTML = '<p>No upcoming matches.</p>';
-    return;
-  }
-
-  matches.forEach(match => {
-    const card = document.createElement('div');
-    card.classList.add('match-card');
-    card.innerHTML = `
-      <h3>${match.teamA || 'Team A'} vs ${match.teamB || 'Team B'}</h3>
-      <p>Date: ${match.date || 'TBD'} | Time: ${match.time || 'TBD'}</p>
-      <p>Status: ${match.status || 'Upcoming'}</p>
-      <p>Score: ${match.teamA || '-'} ${match.scoreA || 0}/${match.wicketsA || 0} | ${match.teamB || '-'} ${match.scoreB || 0}/${match.wicketsB || 0}</p>
-      <p>Overs: ${match.teamA || '-'} ${match.oversA || 0} | ${match.teamB || '-'} ${match.oversB || 0}</p>
-      <p>Top Run Scorer: ${match.topRunScorer || '-'} | Top Wicket Taker: ${match.topWicketTaker || '-'}</p>
-    `;
-    if(match.status && match.status.toLowerCase() === 'live'){
-      liveMatchesDiv.appendChild(card);
-    } else {
-      upcomingMatchesDiv.appendChild(card);
-    }
-  });
-
-  if(liveMatchesDiv.innerHTML === '') liveMatchesDiv.innerHTML = '<p>No live matches currently.</p>';
-  if(upcomingMatchesDiv.innerHTML === '') upcomingMatchesDiv.innerHTML = '<p>No upcoming matches.</p>';
+// Function to switch sections
+function showSection(id){
+  const sections = document.querySelectorAll('section');
+  sections.forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
+
+// Placeholder arrays for manual updates (admin will fill)
+let liveMatches = [];
+let upcomingMatches = [];
+let completedMatches = [];
+let players = []; // Example: {team:'Team A', name:'Player1', logo:'team-logo.png'}
+
+function renderMatches(){
+  const liveDiv = document.getElementById('liveMatches');
+  const upcomingDiv = document.getElementById('upcomingMatches');
+  const completedDiv = document.getElementById('completedMatches');
+  const playersDiv = document.getElementById('playersList');
+
+  liveDiv.innerHTML = liveMatches.length ? '' : '<p>No live matches yet.</p>';
+  upcomingDiv.innerHTML = upcomingMatches.length ? '' : '<p>No upcoming matches yet.</p>';
+  completedDiv.innerHTML = completedMatches.length ? '' : '<p>No completed matches yet.</p>';
+  playersDiv.innerHTML = players.length ? '' : '<p>No players added yet.</p>';
+
+  liveMatches.forEach(m=>{
+    const card = document.createElement('div');
+    card.className='match-card';
+    card.innerHTML=`<h3>${m.teamA} vs ${m.teamB}</h3>
+    <p>Date: ${m.date} | Time: ${m.time}</p>
+    <p>Score: ${m.teamA} ${m.scoreA}/${m.wicketsA} | ${m.teamB} ${m.scoreB}/${m.wicketsB}</p>
+    <p>Overs: ${m.oversA} | ${m.oversB}</p>
+    <p>Top Run Scorer: ${m.topRun} | Top Wicket Taker: ${m.topWkt}</p>`;
+    liveDiv.appendChild(card);
+  });
+
+  upcomingMatches.forEach(m=>{
+    const card = document.createElement('div');
+    card.className='match-card';
+    card.innerHTML=`<h3>${m.teamA} vs ${m.teamB}</h3><p>Date: ${m.date} | Time: ${m.time}</p>`;
+    upcomingDiv.appendChild(card);
+  });
+
+  completedMatches.forEach(m=>{
+    const card = document.createElement('div');
+    card.className='match-card';
+    card.innerHTML=`<h3>${m.teamA} vs ${m.teamB}</h3>
+    <p>Date: ${m.date} | Time: ${m.time}</p>
+    <p>Score: ${m.teamA} ${m.scoreA}/${m.wicketsA} | ${m.teamB} ${m.scoreB}/${m.wicketsB}</p>`;
+    completedDiv.appendChild(card);
+  });
+
+  players.forEach(p=>{
+    const card = document.createElement('div');
+    card.className='player-card';
+    card.innerHTML=`<img src="${p.logo}" alt="${p.team}"><strong>${p.name}</strong><p>${p.team}</p>`;
+    playersDiv.appendChild(card);
+  });
+}
+
+// Call renderMatches() to show current data
+renderMatches();
 </script>
 
 </body>
