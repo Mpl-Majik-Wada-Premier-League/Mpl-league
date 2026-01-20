@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin - MPL</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPL Admin</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<header>
+  <h1>MPL Admin Panel</h1>
+</header>
 
-<script>
-  const pass = prompt("Enter Admin Password");
-  if(pass !== '@mpl_abhi_ihba_2006_09_20_3107//pp2211'){
-    document.body.innerHTML = '<h2>Access Denied</h2>';
-  }
-</script>
-
-<h2>Admin Panel</h2>
-
-<select id="yearSelectAdmin"></select>
-<button id="loadYear">Load Year Data</button>
-
-<div id="adminForm">
-  <!-- Dynamically generated form for editing JSON -->
+<div id="loginDiv">
+  <input type="password" id="adminPass" placeholder="Enter Password">
+  <button onclick="login()">Login</button>
+  <p id="loginMsg"></p>
 </div>
 
-<script src="js/data.js"></script>
+<div id="adminDiv" style="display:none;">
+  <h2>Edit Matches JSON</h2>
+  <textarea id="jsonData" rows="25" cols="100"></textarea><br>
+  <button onclick="saveData()">Save & Download JSON</button>
+  <p>Upload updated JSON to GitHub to persist changes.</p>
+</div>
+
 <script src="js/admin.js"></script>
+</body>
+</html>
