@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MPL League</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MPL League</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <header>
-    <h1>MPL League</h1>
-    <select id="yearSelect"></select>
-  </header>
+<header>
+  <h1>MPL League</h1>
+</header>
 
-  <section id="matches"></section>
+<nav>
+  <label for="yearSelect">Select Year:</label>
+  <select id="yearSelect"></select>
+</nav>
 
-  <script src="js/data.js"></script>
-  <script src="js/ui.js"></script>
+<main>
+  <section id="liveSection">
+    <h2>Live Matches</h2>
+    <div id="liveMatches">Loading live matches...</div>
+  </section>
+
+  <section id="upcomingSection">
+    <h2>Upcoming Matches</h2>
+    <div id="upcomingMatches">Loading upcoming matches...</div>
+  </section>
+</main>
+
+<script src="js/main.js"></script>
 </body>
 </html>
