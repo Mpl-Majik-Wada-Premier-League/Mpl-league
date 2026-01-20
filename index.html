@@ -2,55 +2,70 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MPL League</title>
+<title>MPL League Pro</title>
 <style>
 body{font-family:Poppins;background:#f4f6f8;padding:20px}
-.card{background:#fff;padding:15px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2);margin:12px 0}
-.live{border-left:6px solid red}
-nav button{padding:10px 15px;margin:5px;border:none;background:#1a73e8;color:#fff;border-radius:6px}
-section{display:none}
-section.active{display:block}
+.hidden{display:none}
+button{padding:10px 16px;margin:5px;border:none;border-radius:6px;background:#1a73e8;color:#fff}
+.card{background:#fff;padding:15px;margin:12px 0;border-radius:14px;box-shadow:0 4px 15px rgba(0,0,0,.2)}
+.logo{height:30px;vertical-align:middle}
 </style>
 </head>
-
 <body>
 
-<h1>🏏 MPL League</h1>
+<h1>MPL League</h1>
 
-<nav>
-<button onclick="show('live')">Live</button>
-<button onclick="show('upcoming')">Upcoming</button>
-<button onclick="show('completed')">Completed</button>
-</nav>
+<button onclick="show('matches')">Matches</button>
+<button onclick="show('score')">Live Score</button>
+<button onclick="show('stats')">Stats</button>
 
-<section id="live" class="active"><h2>Live Matches</h2></section>
-<section id="upcoming"><h2>Upcoming Matches</h2></section>
-<section id="completed"><h2>Completed Matches</h2></section>
+<div id="matches" class="hidden"></div>
+<div id="score" class="hidden"></div>
+<div id="stats" class="hidden"></div>
 
 <script>
-const data=JSON.parse(localStorage.getItem("mplData")||"{}");
+const db=JSON.parse(localStorage.getItem("mplPRO")||'{}');
 
 function show(id){
- document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
- document.getElementById(id).classList.add("active");
+ document.querySelectorAll("div").forEach(d=>d.classList.add("hidden"));
+ document.getElementById(id).classList.remove("hidden");
 }
 
-Object.values(data).forEach(year=>{
- ["live","upcoming","completed"].forEach(type=>{
-  year[type]?.forEach(m=>{
-   let c=document.createElement("div");
-   c.className="card"+(type==="live"?" live":"");
-   c.innerHTML=`
-    <b>${m.teamA} vs ${m.teamB}</b><br>
-    Score: ${m.scoreA}/${m.wicketA} - ${m.scoreB}/${m.wicketB}<br>
-    Overs: ${m.oversA} | ${m.oversB}<br>
-    Date: ${m.date} ${m.time}
-   `;
-   document.getElementById(type).appendChild(c);
-  });
+/* MATCH LIST */
+Object.values(db.matches||{}).forEach(m=>{
+ matches.innerHTML+=`
+ <div class="card">
+ <b>${m.teamA} vs ${m.teamB}</b><br>
+ ${m.date} ${m.time} | ${m.status}
+ </div>`;
+});
+
+/* LIVE SCORE */
+Object.values(db.matches||{}).filter(m=>m.status==="live").forEach(m=>{
+ let runs=0,w=0;
+ m.balls.forEach(b=> b.ball==="W"?w++:runs+=Number(b.ball));
+ score.innerHTML+=`
+ <div class="card">
+ <b>${m.teamA} vs ${m.teamB}</b><br>
+ Score: ${runs}/${w}<br>
+ Balls: ${m.balls.map(b=>b.ball).join(" ")}
+ </div>`;
+});
+
+/* STATS */
+Object.values(db.matches||{}).forEach(m=>{
+ let bats={}, bowl={};
+ m.balls.forEach(b=>{
+  bats[b.batsman]=(bats[b.batsman]||0)+(b.ball!=="W"?Number(b.ball):0);
+  bowl[b.bowler]=(bowl[b.bowler]||0)+(b.ball==="W"?1:0);
  });
+ stats.innerHTML+=`
+ <div class="card">
+ <b>${m.teamA} vs ${m.teamB}</b><br>
+ Batsmen: ${JSON.stringify(bats)}<br>
+ Bowlers: ${JSON.stringify(bowl)}
+ </div>`;
 });
 </script>
-
 </body>
 </html>
