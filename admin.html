@@ -135,4 +135,31 @@ function addBall(){
 renderTeams(); renderMatches();
 </script>
 </body>
+</html> };
+ save(); renderMatches();
+}
+function renderMatches(){
+ matchList.innerHTML="";
+ Object.values(db.matches).forEach(m=>{
+  matchList.innerHTML+=`
+  <p>${m.id} (${m.status})
+  <button onclick="deleteMatch('${m.id}')">Delete</button></p>`;
+ });
+}
+function deleteMatch(id){
+ delete db.matches[id]; save(); renderMatches();
+}
+
+/* BALL BY BALL */
+function addBall(){
+ let m=db.matches[liveMatchId.value];
+ if(!m) return alert("Match not found");
+ m.balls.push({batsman,bowler,ball:ball.value});
+ save();
+ alert("Ball Added");
+}
+
+renderTeams(); renderMatches();
+</script>
+</body>
 </html>
