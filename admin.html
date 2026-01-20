@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MPL Admin</title>
+<style>
+body{font-family:Poppins;background:#f4f6f8;padding:20px}
+.card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.2);margin-bottom:20px}
+input,select,button{width:100%;padding:8px;margin:6px 0}
+button{background:#1a73e8;color:#fff;border:none;border-radius:6px}
+</style>
+</head>
+<body>
+
+<div id="loginCard" class="card">
+<h2>Admin Login</h2>
+<input type="password" id="pass" placeholder="Password">
+<button onclick="login()">Login</button>
+<p id="msg"></p>
+</div>
+
+<div id="adminPanel" style="display:none">
+
+<div class="card">
+<h3>Create / Update Match</h3>
+<input id="year" placeholder="Year (2026)">
+<select id="status">
+<option value="live">Live</option>
+<option value="upcoming">Upcoming</option>
+<option value="completed">Completed</option>
+</select>
+<input id="teamA" placeholder="Team A">
+<input id="teamB" placeholder="Team B">
+<input id="scoreA" placeholder="Score A">
+<input id="wicketA" placeholder="Wickets A">
+<input id="oversA" placeholder="Overs A">
+<input id="scoreB" placeholder="Score B">
+<input id="wicketB" placeholder="Wickets B">
+<input id="oversB" placeholder="Overs B">
+<input id="date" type="date">
+<input id="time" type="time">
+<button onclick="saveMatch()">Save Match</button>
+</div>
+
+<div class="card">
+<h3>Add Player</h3>
+<input id="pYear" placeholder="Year">
+<input id="pTeam" placeholder="Team Name">
+<input id="pName" placeholder="Player Name">
+<button onclick="addPlayer()">Add Player</button>
+</div>
+
+</div>
+
+<script>
+const PASSWORD="@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+
+function login(){
+ if(pass.value===PASSWORD){
+  loginCard.style.display="none";
+  adminPanel.style.display="block";
+ }else msg.innerText="Wrong Password";
+}
+
+function getData(){
+ return JSON.parse(localStorage.getItem("mplData")||"{}");
+}
+
+function saveData(d){
+ localStorage.setItem("mplData",JSON.stringify(d));
+}
+
+function saveMatch(){
+ let d=getData();
+ let y=year.value;
+ d[y]??={live:[],upcoming:[],completed:[],players:[]};
+ d[y][status.value].push({
+  teamA:teamA.value, teamB:teamB.value,
+  scoreA, wicketA, oversA,
+  scoreB, wicketB, oversB,
+  date:date.value,time:time.value
+ });
+ saveData(d);
+ alert("Match Saved");
+}
+
+function addPlayer(){
+ let d=getData();
+ let y=pYear.value;
+ d[y]??={live:[],upcoming:[],completed:[],players:[]};
+ d[y].players.push({team:pTeam.value,name:pName.value});
+ saveData(d);
+ alert("Player Added");
+}
+</script>
+</body>
+</html>
