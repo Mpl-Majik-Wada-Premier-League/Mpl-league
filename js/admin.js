@@ -1,37 +1,27 @@
-const yearSelectAdmin = document.getElementById('yearSelectAdmin');
-const adminFormDiv = document.getElementById('adminForm');
-const loadBtn = document.getElementById('loadYear');
+const password = "@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+const loginDiv = document.getElementById('loginDiv');
+const adminDiv = document.getElementById('adminDiv');
+const loginMsg = document.getElementById('loginMsg');
+const jsonData = document.getElementById('jsonData');
 
-getAvailableYears().forEach(y=>{
-  let o=document.createElement('option'); o.value=y; o.text=y;
-  yearSelectAdmin.appendChild(o);
-});
-
-loadBtn.onclick = async ()=>{
-  const year = yearSelectAdmin.value;
-  const data = await loadSeason(year);
-
-  adminFormDiv.innerHTML = '';
-
-  data.matches.forEach((m,index)=>{
-    adminFormDiv.innerHTML += `
-      <div class="matchEdit">
-        <h4>Match ${index+1}</h4>
-        Team A: <input type="text" value="${m.teamA || ''}" id="teamA${index}"><br>
-        Team B: <input type="text" value="${m.teamB || ''}" id="teamB${index}"><br>
-        Date: <input type="date" value="${m.date || ''}" id="date${index}"><br>
-        Time: <input type="time" value="${m.time || ''}" id="time${index}"><br>
-        Score A: <input type="text" value="${m.score?.teamA || ''}" id="scoreA${index}"><br>
-        Score B: <input type="text" value="${m.score?.teamB || ''}" id="scoreB${index}"><br>
-      </div>
-      <hr>
-    `;
-  });
-
-  adminFormDiv.innerHTML += `<button id="saveData">Save Data</button>`;
-
-  document.getElementById('saveData').onclick = ()=>{
-    alert('Save logic: Admin can edit JSON locally and push to GitHub. Direct save via static page is not possible.');
+function login(){
+  const pass = document.getElementById('adminPass').value;
+  if(pass === password){
+    loginDiv.style.display = 'none';
+    adminDiv.style.display = 'block';
+    fetch('data.json')
+      .then(res => res.text())
+      .then(data => jsonData.value = data);
+  } else {
+    loginMsg.textContent = "Incorrect password!";
   }
-};
+}
 
+function saveData(){
+  const blob = new Blob([jsonData.value], {type: "application/json"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "data.json";
+  link.click();
+  alert("Data updated! Upload new data.json to GitHub to persist.");
+}
