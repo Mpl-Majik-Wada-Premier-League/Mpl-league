@@ -1,181 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>MPL League</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(20px)}
-  to {opacity:1; transform:translateY(0)}
-}
-body{
-  margin:0;
-  font-family:'Segoe UI',sans-serif;
-  background:radial-gradient(circle at top,#0e1a3a,#050814);
-  color:#fff;
-}
-header{
-  padding:25px;
-  text-align:center;
-  background:linear-gradient(135deg,#00ffcc,#0055ff);
-  color:#000;
-}
-header h1{
-  margin:0;
-  font-size:30px;
-  letter-spacing:2px;
-}
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:20px;
-}
-.match-card{
-  background:linear-gradient(160deg,#111a3a,#0b1020);
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:18px;
-  animation:fadeIn .6s ease;
-  box-shadow:0 0 20px rgba(0,255,200,.2);
-}
-.teams{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:20px;
-  font-weight:700;
-}
-.vs{
-  background:#00ffcc;
-  color:#000;
-  padding:5px 14px;
-  border-radius:20px;
-  font-size:14px;
-}
-.scores{
-  display:flex;
-  justify-content:space-between;
-  margin-top:10px;
-  font-size:18px;
-  color:#00ffcc;
-}
-.date{
-  font-size:13px;
-  color:#aaa;
-  margin-top:8px;
-}
-.empty{
-  text-align:center;
-  opacity:.6;
-  margin-top:50px;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>MPL League</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <header>
+    <h1>MPL League</h1>
+    <select id="yearSelect"></select>
+  </header>
 
-<header>
-  <h1>MPL LEAGUE</h1>
-  <p>Majik Wada Premier League</p>
-</header>
+  <section id="matches"></section>
 
-<div class="container" id="matches"></div>
-
-<script>
-const data = JSON.parse(localStorage.getItem("mplData")) || [];
-const box = document.getElementById("matches");
-
-if(data.length===0){
-  box.innerHTML="<p class='empty'>No match data yet</p>";
-}
-
-data.forEach(m=>{
-  const card=document.createElement("div");
-  card.className="match-card";
-  card.innerHTML=`
-    <div class="teams">
-      <span>${m.teamA}</span>
-      <span class="vs">VS</span>
-      <span>${m.teamB}</span>
-    </div>
-    <div class="scores">
-      <span>${m.scoreA}</span>
-      <span>${m.scoreB}</span>
-    </div>
-    <div class="date">${m.date}</div>
-  `;
-  box.appendChild(card);
-});
-</script>
-
-</body>
-</html>
-    card.className='card';
-    card.innerHTML = `
-      <div class="match">
-        <div class="team"><h3>${m.teamA}</h3><div class="score">${m.scoreA}</div></div>
-        <div class="vs">VS</div>
-        <div class="team"><h3>${m.teamB}</h3><div class="score">${m.scoreB}</div></div>
-      </div>
-      <div class="meta">${m.dateTime}</div>
-      <h4>Players</h4>
-      <p><b>${m.teamA}:</b> ${m.playersA.join(', ')}</p>
-      <p><b>${m.teamB}:</b> ${m.playersB.join(', ')}</p>
-      <h4>Bowling</h4>
-      <pre>${m.bowling}</pre>
-    `;
-    home.appendChild(card);
-  });
-}
-
-/* ================= ADMIN ================= */
-function setupAdmin(){
-  if(location.pathname.includes('admin')){
-    document.getElementById('adminPanel').classList.remove('admin-only');
-  }
-}
-
-function loginAdmin(){
-  const pass = document.getElementById('adminPass').value;
-  if(pass === ADMIN_PASSWORD){
-    document.getElementById('adminControls').style.display='block';
-  } else alert('Wrong password');
-}
-
-function saveMatch(){
-  const y = yearSelect.value;
-  if(!data[y]) data[y]={matches:[]};
-
-  const match = {
-    id: matchId.value,
-    teamA: teamA.value,
-    teamB: teamB.value,
-    dateTime: dateTime.value,
-    scoreA: scoreA.value,
-    scoreB: scoreB.value,
-    playersA: playersA.value.split(',').map(s=>s.trim()),
-    playersB: playersB.value.split(',').map(s=>s.trim()),
-    bowling: bowling.value
-  };
-
-  const idx = data[y].matches.findIndex(m=>m.id===match.id);
-  if(idx>-1) data[y].matches[idx]=match;
-  else data[y].matches.push(match);
-
-  localStorage.setItem('mplData', JSON.stringify(data));
-  renderYears(); showYear(y);
-  alert('Saved locally');
-}
-
-function exportJSON(){
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'mpl-data.json';
-  a.click();
-}
-
-init();
-</script>
+  <script src="js/data.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 </html>
