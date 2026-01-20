@@ -2,27 +2,28 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>MPL Admin</title>
+<title>MPL Admin Panel</title>
 <style>
 body{font-family:Poppins;background:#f4f6f8;padding:20px}
-.card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,.2);margin-bottom:20px}
+.box{background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.2);margin-bottom:20px}
 input,select,button{width:100%;padding:8px;margin:6px 0}
-button{background:#1a73e8;color:#fff;border:none;border-radius:6px}
+button{background:#1a73e8;color:#fff;border:none;border-radius:6px;cursor:pointer}
 </style>
 </head>
+
 <body>
 
-<div id="loginCard" class="card">
+<div id="loginBox" class="box">
 <h2>Admin Login</h2>
-<input type="password" id="pass" placeholder="Password">
+<input type="password" id="password" placeholder="Enter password">
 <button onclick="login()">Login</button>
 <p id="msg"></p>
 </div>
 
-<div id="adminPanel" style="display:none">
+<div id="adminBox" style="display:none">
 
-<div class="card">
-<h3>Create / Update Match</h3>
+<div class="box">
+<h3>Add Match</h3>
 <input id="year" placeholder="Year (2026)">
 <select id="status">
 <option value="live">Live</option>
@@ -37,29 +38,23 @@ button{background:#1a73e8;color:#fff;border:none;border-radius:6px}
 <input id="scoreB" placeholder="Score B">
 <input id="wicketB" placeholder="Wickets B">
 <input id="oversB" placeholder="Overs B">
-<input id="date" type="date">
-<input id="time" type="time">
+<input type="date" id="date">
+<input type="time" id="time">
 <button onclick="saveMatch()">Save Match</button>
-</div>
-
-<div class="card">
-<h3>Add Player</h3>
-<input id="pYear" placeholder="Year">
-<input id="pTeam" placeholder="Team Name">
-<input id="pName" placeholder="Player Name">
-<button onclick="addPlayer()">Add Player</button>
 </div>
 
 </div>
 
 <script>
-const PASSWORD="@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+const ADMIN_PASSWORD="admin123"; // you can change this
 
 function login(){
- if(pass.value===PASSWORD){
-  loginCard.style.display="none";
-  adminPanel.style.display="block";
- }else msg.innerText="Wrong Password";
+ if(password.value===ADMIN_PASSWORD){
+  loginBox.style.display="none";
+  adminBox.style.display="block";
+ }else{
+  msg.innerText="Wrong password";
+ }
 }
 
 function getData(){
@@ -71,27 +66,27 @@ function saveData(d){
 }
 
 function saveMatch(){
- let d=getData();
+ let data=getData();
  let y=year.value;
- d[y]??={live:[],upcoming:[],completed:[],players:[]};
- d[y][status.value].push({
-  teamA:teamA.value, teamB:teamB.value,
-  scoreA, wicketA, oversA,
-  scoreB, wicketB, oversB,
-  date:date.value,time:time.value
- });
- saveData(d);
- alert("Match Saved");
-}
+ data[y]??={live:[],upcoming:[],completed:[]};
 
-function addPlayer(){
- let d=getData();
- let y=pYear.value;
- d[y]??={live:[],upcoming:[],completed:[],players:[]};
- d[y].players.push({team:pTeam.value,name:pName.value});
- saveData(d);
- alert("Player Added");
+ data[y][status.value].push({
+  teamA:teamA.value,
+  teamB:teamB.value,
+  scoreA:scoreA.value,
+  wicketA:wicketA.value,
+  oversA:oversA.value,
+  scoreB:scoreB.value,
+  wicketB:wicketB.value,
+  oversB:oversB.value,
+  date:date.value,
+  time:time.value
+ });
+
+ saveData(data);
+ alert("Match saved successfully");
 }
 </script>
+
 </body>
 </html>
