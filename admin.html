@@ -3,113 +3,147 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MPL League</title>
+<title>MPL Admin Panel</title>
 <style>
-body { font-family: 'Poppins', sans-serif; margin:0; padding:0; background:#f4f6f8; }
-header { background: linear-gradient(90deg,#1a73e8,#0d47a1); color:white; padding:15px 20px; display:flex; align-items:center; justify-content:center; gap:15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
-header img { height:50px; border-radius:5px; }
-nav { background:#0d47a1; box-shadow: 0 2px 5px rgba(0,0,0,0.2);}
-nav ul { display:flex; list-style:none; margin:0; padding:0; flex-wrap:wrap; }
-nav ul li a { color:white; display:block; padding:12px 20px; text-decoration:none; font-weight:500; transition:0.3s; }
-nav ul li a:hover { background:#1565c0; border-radius:5px; }
-section { display:none; padding:20px; animation:fadeIn 0.5s ease-in; }
-section.active { display:block; }
-@keyframes fadeIn { 0% {opacity:0; transform:translateY(20px);} 100% {opacity:1; transform:translateY(0);} }
-.year-selector { margin-bottom:20px; padding:5px 10px; font-size:16px; border-radius:5px; border:1px solid #ccc; }
-.match-card { background:white; margin:15px 0; padding:15px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s; position:relative; overflow:hidden;}
-.match-card:hover { transform: translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
-.match-card.live::before{ content:"LIVE"; position:absolute; top:10px; left:10px; background:red; color:white; padding:3px 8px; border-radius:5px; font-weight:bold; animation:blink 1s infinite;}
-@keyframes blink{ 0%,50%,100%{opacity:1;} 25%,75%{opacity:0;} }
-.player-card { display:inline-block; margin:10px; padding:10px; background:white; border-radius:15px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.2); transition: transform 0.3s, box-shadow 0.3s;}
-.player-card:hover { transform:scale(1.05); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
-.player-card img { width:60px; height:60px; border-radius:50%; display:block; margin:0 auto 5px; }
-.team-logo { width:40px; height:40px; border-radius:5px; margin-right:5px; vertical-align:middle; }
-.score-number { display:inline-block; font-weight:bold; font-size:18px; color:#1a73e8; transition:0.5s; }
+body{font-family:'Poppins',sans-serif;background:#f4f6f8;margin:0;padding:0;}
+header{background:linear-gradient(90deg,#1a73e8,#0d47a1);color:white;padding:15px 20px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.3);}
+form{margin:20px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.2);}
+form input, form select, form button{display:block;margin:5px 0;padding:8px;width:100%; border-radius:5px; border:1px solid #ccc;}
+form button{background:#1a73e8;color:white;border:none;cursor:pointer; transition:0.3s;}
+form button:hover{background:#0d47a1;}
+.year-section{margin:20px 0; padding:15px; background:white; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.2);}
 </style>
 </head>
 <body>
 
 <header>
-  <img id="mplLogo" src="images/mpl-logo.png" alt="MPL Logo">
-  <h1>MPL League</h1>
+<h1>MPL Admin Panel</h1>
 </header>
 
-<nav>
-  <ul>
-    <li><a href="#" onclick="showSection('home')">Home</a></li>
-    <li><a href="#" onclick="showSection('live')">Live Score</a></li>
-    <li><a href="#" onclick="showSection('upcoming')">Upcoming Matches</a></li>
-    <li><a href="#" onclick="showSection('completed')">Completed Matches</a></li>
-    <li><a href="#" onclick="showSection('players')">Players</a></li>
-  </ul>
-</nav>
+<div id="loginDiv">
+<input type="password" id="adminPass" placeholder="Enter Password">
+<button onclick="login()">Login</button>
+<p id="loginMsg"></p>
+</div>
 
-<section id="home" class="active">
-  <h2>Welcome to MPL League</h2>
-  <p>Select a year and explore live, upcoming, completed matches and player lists.</p>
-</section>
+<div id="adminDiv" style="display:none;">
 
-<section id="live">
-  <h2>Live Matches</h2>
-  <select id="liveYear" class="year-selector" onchange="renderAll()"></select>
-  <div id="liveMatches"><p>No live matches yet.</p></div>
-</section>
+<h2>Upload MPL Logo</h2>
+<input type="file" id="logoUpload" accept="image/*">
+<button type="button" onclick="updateLogo()">Upload Logo</button>
 
-<section id="upcoming">
-  <h2>Upcoming Matches</h2>
-  <select id="upcomingYear" class="year-selector" onchange="renderAll()"></select>
-  <div id="upcomingMatches"><p>No upcoming matches yet.</p></div>
-</section>
+<h2>Year Management</h2>
+<label>Year:</label><input type="number" id="yearInput" value="2026">
+<button type="button" onclick="addYear()">Add/Select Year</button>
 
-<section id="completed">
-  <h2>Completed Matches</h2>
-  <select id="completedYear" class="year-selector" onchange="renderAll()"></select>
-  <div id="completedMatches"><p>No completed matches yet.</p></div>
-</section>
+<div id="yearSections"></div>
 
-<section id="players">
-  <h2>Players List</h2>
-  <select id="playersYear" class="year-selector" onchange="renderAll()"></select>
-  <div id="playersList"><p>No players added yet.</p></div>
-</section>
+</div>
 
 <script>
-// Year-wise data
-let allData = {};
-allData[new Date().getFullYear()]={live:[],upcoming:[],completed:[],players:[]};
+const password="@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+const loginDiv=document.getElementById('loginDiv');
+const adminDiv=document.getElementById('adminDiv');
+let allData={};
 
-function showSection(id){
-  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+function login(){
+  const pass=document.getElementById('adminPass').value;
+  if(pass===password){loginDiv.style.display='none'; adminDiv.style.display='block';}
+  else document.getElementById('loginMsg').textContent="Incorrect password!";
 }
 
-function getYears(){ return Object.keys(allData).sort((a,b)=>b-a); }
-
-function renderYears(){
-  const years=getYears();
-  ['liveYear','upcomingYear','completedYear','playersYear'].forEach(sel=>{
-    const select=document.getElementById(sel);
-    select.innerHTML='';
-    years.forEach(y=>{
-      const option=document.createElement('option');
-      option.value=y; option.textContent=y;
-      select.appendChild(option);
-    });
-  });
+function updateLogo(){
+  const file=document.getElementById('logoUpload').files[0];
+  if(!file) return alert('Select image!');
+  const reader=new FileReader();
+  reader.onload=function(e){
+    let img=document.querySelector('#mplLogo');
+    if(!img){
+      img=document.createElement('img');
+      img.id='mplLogo';
+      img.alt='MPL Logo';
+      img.style.height='50px';
+      img.style.marginRight='15px';
+      document.querySelector('header').prepend(img);
+    }
+    img.src=e.target.result;
+    alert('Logo updated!');
+  }
+  reader.readAsDataURL(file);
 }
 
-function renderAll(){
-  const liveYear=document.getElementById('liveYear')?.value;
-  const upcomingYear=document.getElementById('upcomingYear')?.value;
-  const completedYear=document.getElementById('completedYear')?.value;
-  const playersYear=document.getElementById('playersYear')?.value;
+function addYear(){
+  const year=document.getElementById('yearInput').value;
+  if(!allData[year]) allData[year]={live:[],upcoming:[],completed:[],players:[]};
+  renderYearSection(year);
+}
 
-  function renderMatches(matches, container){
-    container.innerHTML=matches.length?'':'<p>No matches yet.</p>';
-    matches.forEach(m=>{
-      const card=document.createElement('div'); card.className='match-card';
-      if(m.status==='live') card.classList.add('live');
-      card.innerHTML=`<h3>
+function renderYearSection(year){
+  const container=document.getElementById('yearSections');
+  const section=document.createElement('div'); section.className='year-section';
+  section.innerHTML=`
+  <h3>Year ${year}</h3>
+  <h4>Add Match</h4>
+  <label>Type:</label>
+  <select id="matchType-${year}"><option value="live">Live</option><option value="upcoming">Upcoming</option><option value="completed">Completed</option></select>
+  <label>Date:</label><input type="date" id="date-${year}">
+  <label>Time:</label><input type="time" id="time-${year}">
+  <label>Team A:</label><input type="text" id="teamA-${year}">
+  <label>Team A Logo URL:</label><input type="text" id="teamALogo-${year}">
+  <label>Team B:</label><input type="text" id="teamB-${year}">
+  <label>Team B Logo URL:</label><input type="text" id="teamBLogo-${year}">
+  <label>Score Team A:</label><input type="number" id="scoreA-${year}">
+  <label>Wickets Team A:</label><input type="number" id="wicketsA-${year}">
+  <label>Overs Team A:</label><input type="number" id="oversA-${year}">
+  <label>Score Team B:</label><input type="number" id="scoreB-${year}">
+  <label>Wickets Team B:</label><input type="number" id="wicketsB-${year}">
+  <label>Overs Team B:</label><input type="number" id="oversB-${year}">
+  <label>Top Run:</label><input type="text" id="topRun-${year}">
+  <label>Top Wkt:</label><input type="text" id="topWkt-${year}">
+  <button onclick="addMatch('${year}')">Add Match</button>
+
+  <h4>Add Player</h4>
+  <label>Team:</label><input type="text" id="pTeam-${year}">
+  <label>Player Name:</label><input type="text" id="pName-${year}">
+  <label>Logo URL:</label><input type="text" id="pLogo-${year}">
+  <button onclick="addPlayer('${year}')">Add Player</button>
+  `;
+  container.appendChild(section);
+}
+
+function addMatch(year){
+  const match={
+    status:document.getElementById(`matchType-${year}`).value,
+    date:document.getElementById(`date-${year}`).value,
+    time:document.getElementById(`time-${year}`).value,
+    teamA:document.getElementById(`teamA-${year}`).value,
+    teamALogo:document.getElementById(`teamALogo-${year}`).value,
+    teamB:document.getElementById(`teamB-${year}`).value,
+    teamBLogo:document.getElementById(`teamBLogo-${year}`).value,
+    scoreA:parseInt(document.getElementById(`scoreA-${year}`).value)||0,
+    wicketsA:parseInt(document.getElementById(`wicketsA-${year}`).value)||0,
+    oversA:parseInt(document.getElementById(`oversA-${year}`).value)||0,
+    scoreB:parseInt(document.getElementById(`scoreB-${year}`).value)||0,
+    wicketsB:parseInt(document.getElementById(`wicketsB-${year}`).value)||0,
+    oversB:parseInt(document.getElementById(`oversB-${year}`).value)||0,
+    topRun:document.getElementById(`topRun-${year}`).value,
+    topWkt:document.getElementById(`topWkt-${year}`).value
+  };
+  allData[year][match.status].push(match);
+  alert(`Match added for year ${year}!`);
+}
+
+function addPlayer(year){
+  const player={team:document.getElementById(`pTeam-${year}`).value,
+    name:document.getElementById(`pName-${year}`).value,
+    logo:document.getElementById(`pLogo-${year}`).value
+  };
+  allData[year].players.push(player);
+  alert(`Player added for year ${year}!`);
+}
+</script>
+</body>
+</html>
         ${m.teamALogo?`<img class="team-logo" src="${m.teamALogo}">`:''}${m.teamA} 
         vs 
         ${m.teamBLogo?`<img class="team-logo" src="${m.teamBLogo}">`:''}${m.teamB}</h3>
