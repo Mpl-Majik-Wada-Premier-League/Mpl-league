@@ -4,9 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MPL Admin</title>
-<link rel="stylesheet" href="css/style.css">
+<style>
+body { font-family: Arial, sans-serif; background:#f7f7f7; margin:0; padding:0; }
+header { background:#1a73e8; color:white; padding:20px; text-align:center; }
+form { margin:20px; }
+form input, form button { display:block; margin:5px 0; padding:5px; width:250px; }
+form label { font-weight:bold; }
+</style>
 </head>
 <body>
+
 <header>
   <h1>MPL Admin Panel</h1>
 </header>
@@ -18,12 +25,83 @@
 </div>
 
 <div id="adminDiv" style="display:none;">
-  <h2>Edit Matches JSON</h2>
-  <textarea id="jsonData" rows="25" cols="100"></textarea><br>
-  <button onclick="saveData()">Save & Download JSON</button>
-  <p>Upload updated JSON to GitHub to persist changes.</p>
+  <h2>Add / Update Match</h2>
+  <form id="matchForm">
+    <label>Year:</label><input type="text" id="year"><br>
+    <label>Date:</label><input type="date" id="date"><br>
+    <label>Time:</label><input type="time" id="time"><br>
+    <label>Team A:</label><input type="text" id="teamA"><br>
+    <label>Team B:</label><input type="text" id="teamB"><br>
+    <label>Status (Live/Upcoming):</label><input type="text" id="status"><br>
+    <label>Score Team A:</label><input type="number" id="scoreA"><br>
+    <label>Wickets Team A:</label><input type="number" id="wicketsA"><br>
+    <label>Overs Team A:</label><input type="number" id="oversA"><br>
+    <label>Score Team B:</label><input type="number" id="scoreB"><br>
+    <label>Wickets Team B:</label><input type="number" id="wicketsB"><br>
+    <label>Overs Team B:</label><input type="number" id="oversB"><br>
+    <label>Top Run Scorer:</label><input type="text" id="topRunScorer"><br>
+    <label>Top Wicket Taker:</label><input type="text" id="topWicketTaker"><br>
+    <button type="button" onclick="addMatch()">Add / Update Match</button>
+  </form>
+  <button onclick="downloadJSON()">Download JSON</button>
+  <p>After updating, download data.json and upload to GitHub for persistence.</p>
 </div>
 
-<script src="js/admin.js"></script>
+<script>
+const password = "@mpl_abhi_ihba_2006_09_20_3107//pp2211";
+const loginDiv = document.getElementById('loginDiv');
+const adminDiv = document.getElementById('adminDiv');
+const loginMsg = document.getElementById('loginMsg');
+
+let data = {};
+
+function login(){
+  const pass = document.getElementById('adminPass').value;
+  if(pass === password){
+    loginDiv.style.display = 'none';
+    adminDiv.style.display = 'block';
+    fetch('data.json').then(r => r.json()).then(json => data = json);
+  } else loginMsg.textContent = "Incorrect password!";
+}
+
+function addMatch(){
+  const year = document.getElementById('year').value || new Date().getFullYear();
+  if(!data[year]) data[year] = [];
+
+  const match = {
+    date: document.getElementById('date').value,
+    time: document.getElementById('time').value,
+    teamA: document.getElementById('teamA').value,
+    teamB: document.getElementById('teamB').value,
+    status: document.getElementById('status').value,
+    scoreA: parseInt(document.getElementById('scoreA').value) || 0,
+    wicketsA: parseInt(document.getElementById('wicketsA').value) || 0,
+    oversA: parseInt(document.getElementById('oversA').value) || 0,
+    scoreB: parseInt(document.getElementById('scoreB').value) || 0,
+    wicketsB: parseInt(document.getElementById('wicketsB').value) || 0,
+    oversB: parseInt(document.getElementById('oversB').value) || 0,
+    topRunScorer: document.getElementById('topRunScorer').value,
+    topWicketTaker: document.getElementById('topWicketTaker').value
+  };
+
+  const existingIndex = data[year].findIndex(m => m.date === match.date && m.teamA === match.teamA && m.teamB === match.teamB);
+  if(existingIndex >= 0){
+    data[year][existingIndex] = match;
+    alert('Match updated successfully');
+  } else {
+    data[year].push(match);
+    alert('Match added successfully');
+  }
+}
+
+function downloadJSON(){
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "data.json";
+  link.click();
+}
+</script>
+
 </body>
 </html>
